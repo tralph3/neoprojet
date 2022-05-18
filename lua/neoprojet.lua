@@ -73,6 +73,7 @@ M.register_new_project = function(project_name)
     local cwd = vim.fn.getcwd()
     projects[cwd] = {}
     projects[cwd].commands = {}
+    projects[cwd].path = cwd
     if project_name ~= "" then
         projects[cwd].name = project_name
     else
