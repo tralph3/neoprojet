@@ -1,12 +1,12 @@
 local M = require('neoprojet')
 
 vim.api.nvim_create_autocmd('VimLeavePre', {
-    callback = M._write_projects
+    callback = M.write_projects
 })
 
 vim.api.nvim_create_user_command(
     'NPRegisterNewProject', function(args)
-        M.register_new_project(args.fargs[1])
+        M.register_project(args.fargs[1])
     end,
     { nargs='?' }
 )
@@ -19,7 +19,7 @@ vim.api.nvim_create_user_command(
 )
 
 vim.api.nvim_create_user_command(
-    'NPDeleteProject', function(args)
+    'NPDeleteProject', function()
         M.delete_project()
     end,
     { nargs=0 }

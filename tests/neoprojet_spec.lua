@@ -1,60 +1,71 @@
 describe('neoprojet', function()
-    local neoprojet = require('neoprojet')
+    local np = require('neoprojet')
 
     before_each(function()
-        neoprojet.delete_all_projects()
+        np.delete_all_projects()
     end)
 
     it('Project exists', function()
-        neoprojet.register_new_project()
-        assert.same(true, neoprojet._project_exists())
+        np.register_project()
+        assert.same(true, np.project_exists())
+    end)
+
+    it('Project exists with name', function()
+        local project_name = 'Fal'
+        np.register_project(project_name)
+        assert.same(true, np.project_exists(project_name))
     end)
 
     it('Project does not exist', function()
-        assert.same(false, neoprojet._project_exists())
+        assert.same(false, np.project_exists())
+    end)
+
+    it('Project does not exist with name', function()
+        assert.same(false, np.project_exists('Tito'))
     end)
 
     it('Can delete projects', function()
-        neoprojet.register_new_project()
+        np.register_project()
         vim.api.nvim_command(':cd ..')
-        neoprojet.register_new_project()
-        neoprojet.delete_all_projects()
-        assert.same({}, neoprojet.get_projects())
+        np.register_project()
+        np.delete_all_projects()
+        assert.same({}, np.get_projects())
     end)
 
     it('Can rename project', function()
-        local project_name = 'Test name'
-        neoprojet.register_new_project()
-        neoprojet.rename_project(project_name)
-        assert.same(project_name, neoprojet.get_current_project().name)
+        local bad_name = 'serotier gui'
+        local good_name = 'ZeroTier-GUI'
+        np.register_project(bad_name)
+        np.rename_project(good_name, bad_name)
+        assert.same(good_name, np.get_project().name)
     end)
 
     it('Can add command', function()
         local command_name = 'test'
         local command = ':echo should work'
-        neoprojet.register_new_project()
-        neoprojet.register_command(command_name, command)
+        np.register_project()
+        np.register_command(command_name, command)
         assert.same(
-            {[command_name]=command},
-            neoprojet.get_current_project().commands
+            { [command_name]=command },
+            np.get_project().commands
         )
     end)
 
     it('Can call command', function()
         local command_name = 'test'
         local command = ':lua vim.api.nvim_buf_set_name(0, "smth")'
-        neoprojet.register_new_project()
-        neoprojet.register_command(command_name, command)
-        neoprojet.call_command(command_name)
+        np.register_project()
+        np.register_command(command_name, command)
+        np.call_command(command_name)
         assert.same(vim.fn.getcwd().."/smth", vim.api.nvim_buf_get_name(0))
     end)
 
     it('Can delete command', function()
         local command_name = 'test'
         local command = ':echo "test"'
-        neoprojet.register_new_project()
-        neoprojet.register_command(command_name, command)
-        neoprojet.delete_command(command_name)
-        assert.same({}, neoprojet.get_current_project().commands)
+        np.register_project()
+        np.register_command(command_name, command)
+        np.delete_command(command_name)
+        assert.same({}, np.get_project().commands)
     end)
 end)
