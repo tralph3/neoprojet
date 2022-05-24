@@ -7,8 +7,7 @@ local utils = require('neoprojet.utils')
 
 -- REGISTER --
 M.register_project = function(project_name)
-    assert(not M.project_exists(project_name),
-        'This project is already registered.')
+    assert(not M.project_exists(), 'This project is already registered.')
 
     local cwd = vim.fn.getcwd()
     projects[cwd] = {}
