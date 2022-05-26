@@ -11,6 +11,8 @@ M.setup = function(opts)
     end
 
     M.read_projects()
+
+    M.call_init_command()
 end
 
 return M
