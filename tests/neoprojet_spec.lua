@@ -1,5 +1,6 @@
 describe('neoprojet', function()
     local np = require('neoprojet')
+    np.setup({})
 
     before_each(function()
         np.delete_all_projects()

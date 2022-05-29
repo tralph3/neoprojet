@@ -31,7 +31,15 @@ vim.api.nvim_create_user_command(
     'NPSetInitCommand', function(args)
         np.set_init_command(args.fargs[1], args.fargs[2])
     end,
-    { nargs='+' }
+    { nargs='+', -- complete=function(_)
+            -- local project = np.get_project()
+            -- local return_value = ''
+            -- for k, _ in project.commands do
+            --     return_value = string.format('%s\n', k)
+            -- end
+            -- return return_value
+        -- end
+    }
 )
 
 vim.api.nvim_create_user_command(
@@ -89,6 +97,13 @@ vim.api.nvim_create_user_command(
 vim.api.nvim_create_user_command(
     'NPCallInitCommand', function(args)
         np.call_init_command(args.fargs[1])
+    end,
+    { nargs='?' }
+)
+
+vim.api.nvim_create_user_command(
+    'NPCallLeaveCommand', function(args)
+        np.call_leave_command(args.fargs[1])
     end,
     { nargs='?' }
 )
