@@ -30,11 +30,17 @@ describe('neoprojet', function()
         assert.same(false, np.project_exists('Tito'))
     end)
 
-    it('Can delete projects', function()
+    it('Can delete all projects', function()
         np.register_project()
         vim.api.nvim_command(':cd ..')
         np.register_project()
         np.delete_all_projects()
+        assert.same({}, np.get_projects())
+    end)
+
+    it('Can delete project', function()
+        np.register_project()
+        np.delete_project()
         assert.same({}, np.get_projects())
     end)
 

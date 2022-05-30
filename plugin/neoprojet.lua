@@ -115,6 +115,7 @@ vim.api.nvim_create_user_command(
     end,
     { nargs='?' }
 )
+
 vim.api.nvim_create_user_command(
     'NPPrintProjects', function()
         local proj = np.get_projects()

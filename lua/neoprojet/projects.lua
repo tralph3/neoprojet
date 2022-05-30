@@ -15,18 +15,20 @@ end
 M.register_project = function(project_name)
     assert(not M.project_exists(), project_registered_error)
 
+    local project = {}
     local cwd = vim.fn.getcwd()
 
-    projects[cwd] = {}
     if project_name ~= '' then
-        projects[cwd].name = project_name
+        project.name = project_name
     else
-        projects[cwd].name = cwd
+        project.name = cwd
     end
-    projects[cwd].init_command = ''
-    projects[cwd].leave_command = ''
-    projects[cwd].default_file = ''
-    projects[cwd].commands = {}
+    project.root_path = cwd
+    project.init_command = ''
+    project.leave_command = ''
+    project.default_file = ''
+    project.commands = {}
+    table.insert(projects, project)
 end
 
 M.register_command = function(command_name, command)
@@ -86,15 +88,20 @@ M.delete_all_projects = function()
 end
 
 M.delete_project = function(project_name)
-    if not project_name then
-        local cwd = vim.fn.getcwd()
-        projects[cwd] = nil
-        return
+    local query_key = ''
+    local query_value = ''
+    if project_name then
+        query_key = 'name'
+        query_value = project_name
+    else
+        query_key = 'root_path'
+        query_value = vim.fn.getcwd()
     end
 
     for k, v in pairs(projects) do
-        if v.name == project_name then
-            projects[k] = nil
+        if v[query_key] == query_value then
+            table.remove(projects, k)
+            return
         end
     end
 end
@@ -102,15 +109,20 @@ end
 
 -- QUERY --
 M.get_project = function(project_name)
+    local query_key = ''
+    local query_value = ''
     if project_name then
-        for _, v in pairs(projects) do
-            if v.name == project_name then
-                return v
-            end
-        end
+        query_key = 'name'
+        query_value = project_name
     else
-        local cwd = vim.fn.getcwd()
-        return projects[cwd]
+        query_key = 'root_path'
+        query_value = vim.fn.getcwd()
+    end
+
+    for _, v in pairs(projects) do
+        if v[query_key] == query_value then
+            return v
+        end
     end
 end
 
@@ -148,10 +160,33 @@ M.project_exists = function(project_name)
     return M.get_project(project_name) ~= nil
 end
 
+M.switch_project = function(project_name)
+    if project_name then
+        local project = M.get_project(project_name)
+        vim.api.nvim_command('cd '..project.root_path)
+        return
+    end
+
+    local project_names = {}
+    for _, v in pairs(projects) do
+        table.insert(project_names, v.name)
+    end
+
+    vim.ui.select(
+        project_names,
+        {
+            prompt = "Switch to project:",
+        },
+        function(choice)
+            local project = M.get_project(choice)
+            vim.api.nvim_command('silent cd '..project.root_path)
+        end
+    )
+end
 
 -- FILESYSTEM --
 M.read_projects = function()
-    local contents = utils.read_file(config.get('json_path'))
+    local contents = utils.read_file(config.get('project_data_path'))
     local status_ok, stored_projects = pcall(vim.fn.json_decode, contents)
     if not status_ok or stored_projects == vim.NIL then
         return
@@ -162,7 +197,21 @@ end
 M.write_projects = function()
     local projects_json = vim.fn.json_encode(projects)
 
-    utils.write_file(config.get('json_path'), projects_json)
+    utils.write_file(config.get('project_data_path'), projects_json)
+end
+
+M.save_session = function()
+    local project = M.get_project()
+    local session_name = project.root_path:gsub('/', '_')
+    local session_path = config.get('sessions_path')..'/'..session_name
+    vim.api.nvim_command('silent mksession '..session_path)
+end
+
+M.load_session = function()
+    local project = M.get_project()
+    local session_name = project.root_path:gsub('/', '_')
+    local session_path = config.get('sessions_path')..'/'..session_name
+    vim.api.nvim_command('silent source '..session_path)
 end
 
 return M
