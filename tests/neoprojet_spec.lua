@@ -82,24 +82,24 @@ describe('neoprojet', function()
         )
     end)
 
-    it('Can set init command', function()
+    it('Can set enter command', function()
         local command_name = 'test'
         local command = ':lua vim.api.nvim_buf_set_name(0, "smth")'
         np.register_project()
         np.register_command(command_name, command)
-        np.set_init_command(command_name)
-        assert.same(np.get_project().init_command, command_name)
+        np.set_enter_command(command_name)
+        assert.same(np.get_project().enter_command, command_name)
     end)
 
-    it('Can set init command with user command', function()
+    it('Can set enter command with user command', function()
         local command_name = 'test'
         local command = ':lua vim.api.nvim_buf_set_name(0, "smth")'
         vim.api.nvim_command(':NPRegisterProject')
         vim.api.nvim_command(string.format(
             ':NPRegisterCommand %s %s', command_name, command)
         )
-        vim.api.nvim_command(':NPSetInitCommand '..command_name)
-        assert.same(np.get_project().init_command, command_name)
+        vim.api.nvim_command(':NPSetEnterCommand '..command_name)
+        assert.same(np.get_project().enter_command, command_name)
     end)
 
     it('Can set leave command', function()

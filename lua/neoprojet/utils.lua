@@ -2,8 +2,8 @@ local M = {}
 
 M.read_file = function(file_path)
     local file = io.open(file_path, 'r')
-    if file == nil then
-        return nil
+    if not file then
+        return
     end
     local contents = file:read('*a')
     io.close(file)
@@ -12,11 +12,15 @@ end
 
 M.write_file = function(file_path, contents)
     local file = io.open(file_path, 'w')
-    if file == nil then
-        return nil
+    if not file then
+        return
     end
     file:write(contents)
     io.close(file)
+end
+
+M.encode_session_name = function(project_root_path)
+    return project_root_path:gsub('/', '_')
 end
 
 return M

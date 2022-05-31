@@ -7,7 +7,7 @@ local utils = require('neoprojet.utils')
 local project_not_registered_error = 'This project is not registered.'
 local project_registered_error = 'This project is already registered.'
 local function argument_not_optional_error(argument_name)
-    return string.format('Argument %s is not optional.', argument_name)
+    return string.format('Argument "%s" is not optional.', argument_name)
 end
 
 
@@ -24,9 +24,8 @@ M.register_project = function(project_name)
         project.name = cwd
     end
     project.root_path = cwd
-    project.init_command = ''
-    project.leave_command = ''
-    project.default_file = ''
+    project.enter_command = config.get('default_enter_command')
+    project.leave_command = config.get('default_leave_command')
     project.commands = {}
     table.insert(projects, project)
 end
@@ -39,11 +38,11 @@ M.register_command = function(command_name, command)
     M.get_project().commands[command_name] = command
 end
 
-M.set_init_command = function(command_name, project_name)
+M.set_enter_command = function(command_name, project_name)
     assert(command_name ~= nil, argument_not_optional_error('command_name'))
     assert(M.project_exists(), project_not_registered_error)
 
-    M.get_project(project_name).init_command = command_name
+    M.get_project(project_name).enter_command = command_name
 end
 
 M.set_leave_command = function(command_name, project_name)
@@ -126,6 +125,24 @@ M.get_project = function(project_name)
     end
 end
 
+M.get_commands = function(project_name)
+    local query_key = ''
+    local query_value = ''
+    if project_name then
+        query_key = 'name'
+        query_value = project_name
+    else
+        query_key = 'root_path'
+        query_value = vim.fn.getcwd()
+    end
+
+    for _, v in pairs(projects) do
+        if v[query_key] == query_value then
+            return v.commands
+        end
+    end
+end
+
 M.get_projects = function()
     return projects
 end
@@ -138,13 +155,13 @@ M.call_command = function(command_name, project_name)
     vim.api.nvim_command(command or '')
 end
 
-M.call_init_command = function(project_name)
+M.call_enter_command = function(project_name)
     if not M.project_exists(project_name) then
         return
     end
 
     local project = M.get_project(project_name)
-    M.call_command(project.init_command, project_name)
+    M.call_command(project.enter_command, project_name)
 end
 
 M.call_leave_command = function(project_name)
@@ -201,15 +218,21 @@ M.write_projects = function()
 end
 
 M.save_session = function()
+    if not M.project_exists() then
+        return
+    end
     local project = M.get_project()
-    local session_name = project.root_path:gsub('/', '_')
+    local session_name = utils.encode_session_name(project.root_path)
     local session_path = config.get('sessions_path')..'/'..session_name
-    vim.api.nvim_command('silent mksession '..session_path)
+    vim.api.nvim_command('silent mksession! '..session_path)
 end
 
 M.load_session = function()
+    if not M.project_exists() then
+        return
+    end
     local project = M.get_project()
-    local session_name = project.root_path:gsub('/', '_')
+    local session_name = utils.encode_session_name(project.root_path)
     local session_path = config.get('sessions_path')..'/'..session_name
     vim.api.nvim_command('silent source '..session_path)
 end

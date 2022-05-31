@@ -1,14 +1,5 @@
 local np = require('neoprojet')
 
-vim.api.nvim_create_autocmd('VimLeavePre', {
-    callback = np.write_projects,
-})
-
-vim.api.nvim_create_autocmd('DirChanged', {
-    callback = function(_) np.call_init_command() end,
-})
-
-
 -- REGISTER --
 vim.api.nvim_create_user_command(
     'NPRegisterProject', function(args)
@@ -28,17 +19,20 @@ vim.api.nvim_create_user_command(
 )
 
 vim.api.nvim_create_user_command(
-    'NPSetInitCommand', function(args)
-        np.set_init_command(args.fargs[1], args.fargs[2])
+    'NPSetEnterCommand', function(args)
+        np.set_enter_command(args.fargs[1], args.fargs[2])
     end,
-    { nargs='+', -- complete=function(_)
-            -- local project = np.get_project()
-            -- local return_value = ''
-            -- for k, _ in project.commands do
-            --     return_value = string.format('%s\n', k)
-            -- end
-            -- return return_value
-        -- end
+    { nargs='+', complete=function(_)
+            local commands = np.get_commands()
+            if not commands then
+                return
+            end
+            local results = {}
+            for k, _ in pairs(commands) do
+                table.insert(results, k)
+            end
+            return results
+        end
     }
 )
 
@@ -46,7 +40,18 @@ vim.api.nvim_create_user_command(
     'NPSetLeaveCommand', function(args)
         np.set_leave_command(args.fargs[1], args.fargs[2])
     end,
-    { nargs='+' }
+    { nargs='+', complete=function(_)
+            local commands = np.get_commands()
+            if not commands then
+                return
+            end
+            local results = {}
+            for k, _ in pairs(commands) do
+                table.insert(results, k)
+            end
+            return results
+        end
+    }
 )
 
 
@@ -95,8 +100,8 @@ vim.api.nvim_create_user_command(
 )
 
 vim.api.nvim_create_user_command(
-    'NPCallInitCommand', function(args)
-        np.call_init_command(args.fargs[1])
+    'NPCallEnterCommand', function(args)
+        np.call_enter_command(args.fargs[1])
     end,
     { nargs='?' }
 )

@@ -16,9 +16,10 @@ M.setup = function(opts)
         vim.fn.system('mkdir '..config.get('sessions_path'))
     end
 
-    M.read_projects()
+    require('neoprojet.autocmds')
 
-    M.call_init_command()
+    M.read_projects()
+    M.call_enter_command()
 end
 
 return M

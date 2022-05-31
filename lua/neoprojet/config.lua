@@ -2,8 +2,9 @@ local M = {}
 
 local config = {
     project_dir_path = vim.fn.stdpath('data')..'/neoprojet',
-    save_sessions = true,
-    load_sessions = true,
+    sessions = true,
+    default_enter_command = '',
+    default_leave_command = '',
 }
 
 M.extend = function(override)
