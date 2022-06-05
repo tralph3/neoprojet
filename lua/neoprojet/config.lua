@@ -1,7 +1,7 @@
 local M = {}
 
 local config = {
-    project_dir_path = vim.fn.stdpath('data')..'/neoprojet',
+    project_dir_path = vim.fn.stdpath('data'),
     sessions = true,
     default_enter_command = '',
     default_leave_command = '',

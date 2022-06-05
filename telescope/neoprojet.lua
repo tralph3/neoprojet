@@ -1,33 +1,39 @@
+local status_ok, _ = pcall(require, 'telescope')
+
+if not status_ok then
+  return
+end
+
 local pickers = require('telescope.pickers')
 local finders = require('telescope.finders')
 local actions = require('telescope.actions')
 local action_state = require('telescope.actions.state')
-local conf = require('telescope.config').values
-local neoprojet = require('neoprojet')
+local config = require('telescope.config').values
+local np = require('neoprojet')
 
 local projects = function(opts)
     opts = opts or {}
     pickers.new(opts, {
         prompt_title = "Projects",
         finder = finders.new_table({
-            results = neoprojet._get_projects_telescope(),
+            results = np.get_projects(),
             entry_maker = function(entry)
                 return {
                     value = entry,
-                    display = entry.name,
+                    display = string.format("%-50s %s", entry.name, entry.root_path),
                     ordinal = entry.name,
                 }
             end,
         }),
-        attach_mappings = function(prompt_bufnr, map)
+        attach_mappings = function(prompt_bufnr)
             actions.select_default:replace(function()
                 actions.close(prompt_bufnr)
                 local selection = action_state.get_selected_entry()
-                vim.api.nvim_put({ selection[1] }, "", false, true)
+                np.switch_project(selection.value)
             end)
             return true
         end,
-        sorter = conf.generic_sorter(opts),
+        sorter = config.generic_sorter(opts),
     }):find()
 end
 

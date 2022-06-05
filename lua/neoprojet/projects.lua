@@ -180,6 +180,9 @@ end
 M.switch_project = function(project_name)
     if project_name then
         local project = M.get_project(project_name)
+        if not project then
+            return
+        end
         vim.api.nvim_command('cd '..project.root_path)
         return
     end

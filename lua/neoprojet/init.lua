@@ -6,6 +6,9 @@ M = vim.tbl_extend('force', M, require('neoprojet.projects'))
 M.setup = function(opts)
     config.extend(opts)
     config.set(
+        'project_dir_path', config.get('project_dir_path')..'/neoprojet'
+    )
+    config.set(
         'project_data_path', config.get('project_dir_path')..'/projects.json'
     )
     config.set(
