@@ -122,8 +122,6 @@ describe('neoprojet', function()
         assert.same(np.get_project().leave_command, command_name)
     end)
 
-    -- TODO: Override and extend project by passing a table that adheres to the schema
-
     it('Can call command', function()
         local command_name = 'test'
         local command = ':lua vim.api.nvim_buf_set_name(0, "smth")'
@@ -140,5 +138,15 @@ describe('neoprojet', function()
         np.register_command(command_name, command)
         np.delete_command(command_name)
         assert.same({}, np.get_project().commands)
+    end)
+
+    it('Can switch project', function()
+        local project_name = 'neoprojet'
+        np.register_project(project_name)
+        local cwd = vim.fn.getcwd()
+        vim.api.nvim_command('cd ..')
+        assert(cwd ~= vim.fn.getcwd())
+        np.switch_project(project_name)
+        assert.same(cwd, vim.fn.getcwd())
     end)
 end)

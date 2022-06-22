@@ -77,7 +77,15 @@ vim.api.nvim_create_user_command(
 )
 
 vim.api.nvim_create_user_command(
-    'NPDeleteAllProjects', np.delete_all_projects, { nargs=0 }
+    'NPDeleteAllProjects', function(_)
+        vim.ui.select({ 'Yes', 'No' }, { prompt='Delete all projects?' } ,
+        function(choice)
+            if choice == 'Yes' then
+                np.delete_all_projects()
+            end
+        end)
+    end,
+    { nargs=0 }
 )
 
 vim.api.nvim_create_user_command(
@@ -123,4 +131,18 @@ vim.api.nvim_create_user_command(
         print(vim.inspect(proj))
     end,
     { nargs=0 }
+)
+
+vim.api.nvim_create_user_command(
+    'NPSwitchProject', function(args)
+        np.switch_project(args.fargs[1])
+    end,
+    { nargs=1, complete=function(_)
+            local project_names = {}
+            for _, v in pairs(np.get_projects()) do
+                table.insert(project_names, v.name)
+            end
+            return project_names
+        end
+    }
 )

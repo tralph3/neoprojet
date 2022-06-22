@@ -80,12 +80,7 @@ M.delete_command = function(command_name, project_name)
 end
 
 M.delete_all_projects = function()
-    vim.ui.select({ 'Yes', 'No' }, { prompt='Delete all projects?' } ,
-    function(choice)
-        if choice == 'Yes' then
-            projects = {}
-        end
-    end)
+    projects = {}
 end
 
 M.delete_project = function(project_name)
@@ -179,30 +174,11 @@ M.project_exists = function(project_name)
 end
 
 M.switch_project = function(project_name)
-    if project_name then
-        local project = M.get_project(project_name)
-        if not project then
-            return
-        end
-        vim.api.nvim_command('cd '..project.root_path)
-        return
-    end
+    assert(project_name ~= nil, argument_not_optional_error('project_name'))
+    assert(M.project_exists(project_name), project_not_registered_error)
 
-    local project_names = {}
-    for _, v in pairs(projects) do
-        table.insert(project_names, v.name)
-    end
-
-    vim.ui.select(
-        project_names,
-        {
-            prompt = "Switch to project:",
-        },
-        function(choice)
-            local project = M.get_project(choice)
-            vim.api.nvim_command('silent cd '..project.root_path)
-        end
-    )
+    local project = M.get_project(project_name)
+    vim.api.nvim_command('cd '..project.root_path)
 end
 
 M.read_projects = function()
