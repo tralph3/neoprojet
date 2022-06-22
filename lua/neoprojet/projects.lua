@@ -11,7 +11,6 @@ local function argument_not_optional_error(argument_name)
 end
 
 
--- REGISTER --
 M.register_project = function(project_name)
     assert(not M.project_exists(), project_registered_error)
 
@@ -53,7 +52,6 @@ M.set_leave_command = function(command_name, project_name)
 end
 
 
--- MODIFY --
 M.rename_project = function(new_name, project_name)
     assert(new_name ~= nil, argument_not_optional_error('new_name'))
     assert(M.project_exists(project_name), project_not_registered_error)
@@ -74,7 +72,6 @@ M.rename_command = function(old_name, new_name, project_name)
 end
 
 
--- DELETE --
 M.delete_command = function(command_name, project_name)
     assert(command_name ~= nil, argument_not_optional_error('command_name'))
     assert(M.project_exists(project_name), project_not_registered_error)
@@ -83,7 +80,12 @@ M.delete_command = function(command_name, project_name)
 end
 
 M.delete_all_projects = function()
-    projects = {}
+    vim.ui.select({ 'Yes', 'No' }, { prompt='Delete all projects?' } ,
+    function(choice)
+        if choice == 'Yes' then
+            projects = {}
+        end
+    end)
 end
 
 M.delete_project = function(project_name)
@@ -106,7 +108,6 @@ M.delete_project = function(project_name)
 end
 
 
--- QUERY --
 M.get_project = function(project_name)
     local query_key = ''
     local query_value = ''
@@ -204,7 +205,6 @@ M.switch_project = function(project_name)
     )
 end
 
--- FILESYSTEM --
 M.read_projects = function()
     local contents = utils.read_file(config.get('project_data_path'))
     local status_ok, stored_projects = pcall(vim.fn.json_decode, contents)

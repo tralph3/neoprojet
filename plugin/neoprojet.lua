@@ -1,6 +1,5 @@
 local np = require('neoprojet')
 
--- REGISTER --
 vim.api.nvim_create_user_command(
     'NPRegisterProject', function(args)
         np.register_project(args.fargs[1])
@@ -55,7 +54,6 @@ vim.api.nvim_create_user_command(
 )
 
 
--- MODIFY --
 vim.api.nvim_create_user_command(
     'NPRenameProject', function(args)
         np.rename_project(args.fargs[1], args.fargs[2])
@@ -71,7 +69,6 @@ vim.api.nvim_create_user_command(
 )
 
 
--- DELETE --
 vim.api.nvim_create_user_command(
     'NPDeleteProject', function(args)
         np.delete_project(args.fargs[1])
@@ -91,7 +88,6 @@ vim.api.nvim_create_user_command(
 )
 
 
--- QUERY --
 vim.api.nvim_create_user_command(
     'NPCallCommand', function(args)
         np.call_command(args.fargs[1], args.fargs[2])
