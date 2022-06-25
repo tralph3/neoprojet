@@ -29,7 +29,7 @@ local projects = function(opts)
             actions.select_default:replace(function()
                 actions.close(prompt_bufnr)
                 local selection = action_state.get_selected_entry()
-                np.switch_project(selection.value)
+                np.switch_project(selection.value.name)
             end)
             return true
         end,
