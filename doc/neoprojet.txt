@@ -1,0 +1,360 @@
+==============================================================================
+INTRODUCTION
+                                                                   *neoprojet*
+
+Neoprojet is a plugin that makes project management easy and extensible. It
+allows you to define custom commands and behavior to automate your work.
+
+This plugin features Telescope integration, which provides a nice front-end to
+interact with it. Alternatively, it exposes a Lua API that you can use for
+scripting, and User Commands for every feature in it.
+
+==============================================================================
+LUA API
+                                                           *neoprojet.setup()*
+neoprojet.setup({opts})
+    Initializes the plugin. The user should pass a table overriding the
+    options as they see fit. Alternatively, and empty table, or nothing at
+    all, can be passed to use all defaults.
+>
+    neoprojet.setup({
+        -- This is the directory where the project data is going to be saved
+        project_dir_path = vim.fn.stdpath('data'),
+
+        -- Enabling this option will enable the sessions feature. If enabled,
+        neovim sessions will be saved when leaving a project, and will be
+        restored when entering one. The session file will be saved in the
+        project dir path.
+        sessions = false,
+
+        -- Sets the default name for the enter command. When registering a new
+        project, this name will be set as the enter command.
+        default_enter_command = '',
+
+        -- Sets the default name for the leave command. When registering a new
+        project, this name will be set as the leave command.
+        default_leave_command = '',
+    })
+<
+                                                *neoprojet.register_project()*
+neoprojet.register_project({project_name})
+    Registers a project for the current working directory. Optionally, a
+    string can be passed as the project name. If left blank, the current
+    working directory's path will be used for the name.
+
+    If a project with the provided name already exists, or the current working
+    directory is already registered as a project, it raises an error.
+>
+    neoprojet.register_project('neoprojet')
+<
+                                                *neoprojet.register_command()*
+neoprojet.register_command({command_name}, {command})
+    Registers a command for the current project (based on the current working
+    directory). If the command already exists, it gets overwritten without
+    confirmation. Both of the parameters are strings.
+
+    The command name will be used to call the command, and the command itself
+    will be ran on neovim's command line. Lua functions are not supported
+    since they can't be stored in a JSON. However, you can write a command
+    that calls the lua function.
+>
+    neoprojet.register_command('build', '!cargo build')
+<
+                                               *neoprojet.set_enter_command()*
+neoprojet.set_enter_command({command_name}, {project_name})
+    Sets the enter command for the current project (based on the current
+    working directory). If a project name is provided, the enter command gets
+    registered for the project asociated with that name. Both of the
+    parameters should be strings.
+
+    The enter command gets called when entering a project (when switching the
+    working directory). The argument must be the command name, not a command
+    itself.
+>
+    neoprojet.register_command('say_hi', 'lua print("hi")')
+    neoprojet.set_enter_command('say_hi')
+<
+                                               *neoprojet.set_leave_command()*
+neoprojet.set_leave_command({command_name}, {project_name})
+    Sets the leave command for the current project (based on the current
+    working directory). If a project name is provided, the leave command gets
+    registered for the project asociated with that name. Both of the
+    parameters should be strings.
+
+    The leave command gets called when leaving a project (when switching the
+    working directory). The argument must be the command name, not a command
+    itself.
+>
+    neoprojet.register_command('say_bye', 'lua print("bye")')
+    neoprojet.set_leave_command('say_bye')
+<
+                                                  *neoprojet.rename_project()*
+neoprojet.rename_project({new_name}, {project_name})
+    Renames the current project (based on the current working directory). If a
+    project name is provided, the project asociated with that name gets
+    renamed instead.
+>
+    neoprojet.register_project('cerro-tier')
+    neoprojet.rename_project('ZeroTier-GUI', 'cerro-tier')
+<
+                                                  *neoprojet.rename_command()*
+neoprojet.rename_command({old_name}, {new_name}, {project_name})
+    Renames the command asociated with `old_name` on the current project
+    (based on current working directory) to `new_name`. If a project name is
+    provided, it acts on the project asociated with that name instead.
+>
+    neoprojet.register_command('aay-ji', 'lua print("hi")')
+    neoprojet.rename_command('ayy-ji', 'say_hi')
+<
+                                                  *neoprojet.delete_command()*
+neoprojet.delete_command({command_name}, {project_name})
+    Deletes the command asociated with `command_name` for the current project
+    (based on current working directory). If a project name is provided, it
+    acts on the project asociated with that name instead. There is no
+    confirmation.
+>
+    neoprojet.register_command('bad_command', 'lua print("dont delete pls")')
+    neoprojet.delete_command('bad_command')
+<
+                                             *neoprojet.delete_all_projects()*
+neoprojet.delete_all_projects()
+    Deletes all registered projects. There is no confirmation. This is not
+    commited until neovim exits. If you accidentally deleted all projects, you
+    can restore them by calling |neoprojet.read_projects()|.
+>
+    neoprojet.delete_all_projects()
+<
+                                                  *neoprojet.delete_project()*
+neoprojet.delete_project({project_name})
+    Deletes the current project (based on current working directory). If a
+    project name is provided, it deletes the project asociated with that name
+    instead.
+>
+    neoprojet.delete_project()
+<
+                                                     *neoprojet.get_project()*
+neoprojet.get_project({project_name})
+    Returns a table containing the project data for the current project (based
+    on current working directory). If a project name is provided, then it
+    returns the data of the project asociated with that name. This table
+    serves as read-only, since modifying it won't affect the data the plugin
+    keeps track of.
+>
+    local current_project = neoprojet.get_project()
+    print(current_project.name)
+<
+                                                *neoprojet.get_all_projects()*
+neoprojet.get_all_projects()
+    Returns the entire project table. This is the actual table used by the
+    plugin, any modifications made to it will be reflected on the plugin
+    itself, and will be saved on exit. Be careful.
+>
+    local projects = neoprojet.get_all_projects()
+    for _, v in pairs(projects) do
+        print(v.name)
+    end
+<
+                                                    *neoprojet.get_commands()*
+neoprojet.get_commands({project_name})
+    Returns a table containing the commands registered for the current project
+    (based on current working directory). If a project name is provided, then
+    it returns the data of the project asociated with that name. This table
+    serves as read-only, since modifying it won't affect the data the plugin
+    keeps track of.
+>
+    local current_commands = neoprojet.get_commands()
+    print(current_commands['build'] ~= nil)
+<
+                                                    *neoprojet.call_command()*
+neoprojet.call_command({command_name}, {project_name})
+    Executes the command asociated with `command_name` on the current project
+    (based on current working directory). If a project name is provided, it
+    will call the command stored in that project. The command is executed in
+    neovim's command line, via it's API function |nvim_command|.
+>
+    neoprojet.register_command('run_tests', 'PlenaryBustedDirectory tests/')
+    neoprojet.call_command('run_tests')
+<
+                                              *neoprojet.call_enter_command()*
+neoprojet.call_enter_command({project_name})
+    Executes the command registered as "enter" for the current project (based
+    on current working directory). If a project name is provided, it will call
+    the enter command of the project asociated with that name instead.
+>
+    neoprojet.call_enter_command()
+<
+                                              *neoprojet.call_leave_command()*
+neoprojet.call_leave_command({project_name})
+    Executes the command registered as "leave" for the current project (based
+    on current working directory). If a project name is provided, it will call
+    the leave command of the project asociated with that name instead.
+>
+    neoprojet.call_leave_command()
+<
+                                                  *neoprojet.project_exists()*
+neoprojet.project_exists({project_name})
+    Returns a boolean indicating if the current working directory is
+    registered as a project. If a project name is provided, it checks if a
+    project already exists with that name.
+>
+    if not neoprojet.project_exists() then
+        neoprojet.register_project()
+    end
+<
+                                                  *neoprojet.switch_project()*
+neoprojet.switch_project({project_name})
+    Changes the current project to the one asociated with the given name. All
+    the needed operations (executing enter and leave commands, saving
+    sessions) are performed by autocommands when changing directories.
+>
+    neoprojet.switch_project('ddi')
+<
+                                                   *neoprojet.read_projects()*
+neoprojet.read_projects()
+    Reads the project data stored on disk, and overwrites the one stored on
+    memory. This function is automatically called on neovim's startup.
+>
+    neoprojet.delete_all_projects() --OOPS
+    neoprojet.read_projects() --All is good
+<
+                                                  *neoprojet.write_projects()*
+neoprojet.write_projects()
+    Writes the project data stored on memory to disk, overwriting contents.
+    This function is automatically called on neovim's exit.
+>
+    neoprojet.register_project()
+    neoprojet.write_projects() --Saves the new project now
+<
+                                                    *neoprojet.save_session()*
+neoprojet.save_session()
+    Saves the current session to disk using neovim's |mksession| command. This
+    gets automatically called when leaving a project if the session option is
+    set (off by default).
+>
+    neoprojet.save_session()
+<
+                                                    *neoprojet.load_session()*
+neoprojet.load_session()
+    Loads the session saved for the current project. This function gets
+    automatically called when entering a project if the session option is set
+    (off by default).
+>
+    neoprojet.load_session()
+<
+==============================================================================
+USER COMMANDS
+                                                     *neoprojet.user_commands*
+
+All of neoprojet's user commands are prefixed with "NP". Most user commands
+provide tab completion, and implement safety measures where applicable (when
+deleting projects for instance).
+
+                                                          *:NPRegisterProject*
+
+Behaves the same as |neoprojet.register_project()|. Tab completion autofills
+the name of the current directory.
+>
+    :NPRegisterProject
+<
+                                                          *:NPRegisterCommand*
+
+Behaves the same as |neoprojet.register_command()|. There's no tab completion.
+All arguments past the first will be treated as part of the command.
+>
+    :NPRegisterCommand "Say hi" lua print('hi')
+    :NPRegisterCommand say_hello lua print('hello')
+<
+                                                          *:NPSetEnterCommand*
+
+Behaves the same as |neoprojet.set_enter_command()|. Tab completion provides a
+list of the registered commands for the current project (based on current
+working directory).
+>
+    :NPSetEnterCommand enter
+<
+                                                          *:NPSetLeaveCommand*
+
+Behaves the same as |neoprojet.set_leave_command()|. Tab completion provides a
+list of the registered commands for the current project (based on current
+working directory).
+>
+    :NPSetLeaveCommand leave
+<
+                                                            *:NPRenameProject*
+
+Behaves the same as |neoprojet.rename_project()|. Tab completion provides a
+list of all the registered projects.
+>
+    :NPRenameProject steam-metadata-editor
+<
+                                                            *:NPRenameCommand*
+
+Behaves the same as |neoprojet.rename_command()|. Tab completion provides a
+list of the registered commands for the current project (based on current
+working directory).
+>
+    :NPRenameCommand server run_server
+<
+                                                            *:NPDeleteProject*
+
+Behaves the same as |neoprojet.delete_project()|. Tab completion provides a
+list of all the registered projects. A confirmation prompt will come up to
+confirm.
+>
+    --Dreaming is free
+    :NPDeleteProject electron
+<
+                                                        *:NPDeleteAllProjects*
+
+Behaves the same as |neoprojet.delete_all_projects()|. There is no tab
+completion. A confirmation prompt will come up to confirm.
+>
+    :NPDeleteAllProjects
+<
+                                                            *:NPDeleteCommand*
+
+Behaves the same as |neoprojet.delete_command()|. Tab completion provides a
+list of the registered commands for the current project (based on current
+working directory).
+>
+    :NPDeleteCommand start_local_server
+<
+                                                              *:NPCallCommand*
+
+Behaves the same as |neoprojet.call_command()|. Tab completion provides a list
+of the registered commands for the current project (based on current working
+directory).
+>
+    :NPCallCommand debug
+<
+                                                         *:NPCallEnterCommand*
+
+Behaves the same as |neoprojet.call_enter_command()|. Tab completion provides a
+list of all the registered projects.
+>
+    :NPCallEnterCommand cuemaker
+<
+                                                         *:NPCallLeaveCommand*
+
+Behaves the same as |neoprojet.call_leave_command()|. Tab completion provides a
+list of all the registered projects.
+>
+    :NPCallLeaveCommand brainfuck_interpreter
+<
+                                                             *:NPPrintProject*
+Behaves the same as |neoprojet.get_project()| but instead of returning a table,
+it prints it to the console.
+>
+    :NPPrintProject retroarch
+<
+                                                         *:NPPrintAllProjects*
+Behaves the same as |neoprojet.get_all_projects()| but instead of returning a
+table, it prints it to the console.
+>
+    :NPPrintAllProjects
+<
+==============================================================================
+TELESCOPE INTEGRATION
+
+ TODO
+vim:tw=78:ts=8:ft=help:norl:

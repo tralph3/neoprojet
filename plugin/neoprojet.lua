@@ -14,7 +14,7 @@ end
 
 local function generate_project_list(_)
     local project_names = {}
-    for _, v in pairs(np.get_projects()) do
+    for _, v in pairs(np.get_all_projects()) do
         table.insert(project_names, v.name)
     end
     return project_names
@@ -73,7 +73,12 @@ vim.api.nvim_create_user_command(
 
 vim.api.nvim_create_user_command(
     'NPDeleteProject', function(args)
-        np.delete_project(args.fargs[1])
+        vim.ui.select({ 'Yes', 'No' }, { prompt='Delete project?' } ,
+        function(choice)
+            if choice == 'Yes' then
+                np.delete_project(args.fargs[1])
+            end
+        end)
     end,
     { nargs='?', complete=generate_project_list }
 )
@@ -128,8 +133,8 @@ vim.api.nvim_create_user_command(
 )
 
 vim.api.nvim_create_user_command(
-    'NPPrintProjects', function()
-        local proj = np.get_projects()
+    'NPPrintAllProjects', function()
+        local proj = np.get_all_projects()
         print(vim.inspect(proj))
     end,
     { nargs=0 }

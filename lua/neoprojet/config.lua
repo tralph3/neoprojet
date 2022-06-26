@@ -2,7 +2,7 @@ local M = {}
 
 local config = {
     project_dir_path = vim.fn.stdpath('data'),
-    sessions = true,
+    sessions = false,
     default_enter_command = '',
     default_leave_command = '',
 }

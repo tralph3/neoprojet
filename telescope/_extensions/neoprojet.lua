@@ -1,4 +1,4 @@
-local status_ok, _ = pcall(require, 'telescope')
+local status_ok, telescope = pcall(require, 'telescope')
 
 if not status_ok then
   return
@@ -11,16 +11,19 @@ local action_state = require('telescope.actions.state')
 local config = require('telescope.config').values
 local np = require('neoprojet')
 
-local projects = function(opts)
+local function projects(opts)
     opts = opts or {}
     pickers.new(opts, {
         prompt_title = "Projects",
+        preview = true,
         finder = finders.new_table({
-            results = np.get_projects(),
+            results = np.get_all_projects(),
             entry_maker = function(entry)
                 return {
                     value = entry,
-                    display = string.format("%-50s %s", entry.name, entry.root_path),
+                    display = string.format(
+                        "%-50s %-5s %s", entry.name:sub(1, 50), "", entry.root_path
+                    ),
                     ordinal = entry.name,
                 }
             end,
@@ -37,4 +40,8 @@ local projects = function(opts)
     }):find()
 end
 
-projects()
+return telescope.register_extension({
+    exports = {
+        neoprojet = projects,
+    },
+})

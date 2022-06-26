@@ -139,7 +139,7 @@ M.get_commands = function(project_name)
     end
 end
 
-M.get_projects = function()
+M.get_all_projects = function()
     return projects
 end
 
