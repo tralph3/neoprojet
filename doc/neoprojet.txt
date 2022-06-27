@@ -1,6 +1,5 @@
 ==============================================================================
-INTRODUCTION
-                                                                   *neoprojet*
+INTRODUCTION                                                       *neoprojet*
 
 Neoprojet is a plugin that makes project management easy and extensible. It
 allows you to define custom commands and behavior to automate your work.
@@ -10,7 +9,8 @@ interact with it. Alternatively, it exposes a Lua API that you can use for
 scripting, and User Commands for every feature in it.
 
 ==============================================================================
-LUA API
+LUA API                                                        *neoprojet-lua*
+
                                                            *neoprojet.setup()*
 neoprojet.setup({opts})
     Initializes the plugin. The user should pass a table overriding the
@@ -99,8 +99,8 @@ neoprojet.rename_project({new_name}, {project_name})
 <
                                                   *neoprojet.rename_command()*
 neoprojet.rename_command({old_name}, {new_name}, {project_name})
-    Renames the command asociated with `old_name` on the current project
-    (based on current working directory) to `new_name`. If a project name is
+    Renames the command asociated with {old_name} on the current project
+    (based on current working directory) to {new_name}. If a project name is
     provided, it acts on the project asociated with that name instead.
 >
     neoprojet.register_command('aay-ji', 'lua print("hi")')
@@ -108,7 +108,7 @@ neoprojet.rename_command({old_name}, {new_name}, {project_name})
 <
                                                   *neoprojet.delete_command()*
 neoprojet.delete_command({command_name}, {project_name})
-    Deletes the command asociated with `command_name` for the current project
+    Deletes the command asociated with {command_name} for the current project
     (based on current working directory). If a project name is provided, it
     acts on the project asociated with that name instead. There is no
     confirmation.
@@ -167,7 +167,7 @@ neoprojet.get_commands({project_name})
 <
                                                     *neoprojet.call_command()*
 neoprojet.call_command({command_name}, {project_name})
-    Executes the command asociated with `command_name` on the current project
+    Executes the command asociated with {command_name} on the current project
     (based on current working directory). If a project name is provided, it
     will call the command stored in that project. The command is executed in
     neovim's command line, via it's API function |nvim_command|.
@@ -242,8 +242,7 @@ neoprojet.load_session()
     neoprojet.load_session()
 <
 ==============================================================================
-USER COMMANDS
-                                                     *neoprojet.user_commands*
+USER COMMANDS                                        *neoprojet-user-commands*
 
 All of neoprojet's user commands are prefixed with "NP". Most user commands
 provide tab completion, and implement safety measures where applicable (when
@@ -354,7 +353,7 @@ table, it prints it to the console.
     :NPPrintAllProjects
 <
 ==============================================================================
-TELESCOPE INTEGRATION
+TELESCOPE INTEGRATION                                    *neoprojet-telescope*
 
- TODO
+TODO
 vim:tw=78:ts=8:ft=help:norl:
