@@ -12,12 +12,12 @@ end
 
 
 M.register_project = function(project_name)
-    assert(not M.project_exists(), project_registered_error)
+    assert(not M.project_exists(project_name), project_registered_error)
 
     local project = {}
     local cwd = vim.fn.getcwd()
 
-    if project_name ~= '' then
+    if project_name then
         project.name = project_name
     else
         project.name = cwd
