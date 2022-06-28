@@ -149,4 +149,16 @@ describe('neoprojet', function()
         np.switch_project(project_name)
         assert.same(cwd, vim.fn.getcwd())
     end)
+
+    it('Can move project', function()
+        local project_name = 'QuodLibet'
+        np.register_project(project_name)
+        local old_dir = np.get_project().root_path
+        vim.api.nvim_command('cd ../..')
+        np.move_project(project_name)
+        assert(old_dir ~= np.get_project(project_name).root_path)
+        vim.api.nvim_command('cd '..old_dir)
+        np.move_project(project_name)
+        assert(old_dir == np.get_project(project_name).root_path)
+    end)
 end)

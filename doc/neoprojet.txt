@@ -241,6 +241,17 @@ neoprojet.load_session()
 >
     neoprojet.load_session()
 <
+                                                    *neoprojet.move_project()*
+neoprojet.move_project({project_name})
+    Given a project name, changes its root directory to the current working
+    directory. The {project_name} parameter is required. If the directory
+    you're moving the project to is already registered as a project, it will
+    throw an error.
+>
+    neoprojet.register_project('neovim') -- wrong dir!
+    vim.api.nvim_command('cd ..') -- change dir
+    neoprojet.move_project('neovim') -- root dir gets updated
+<
 ==============================================================================
 USER COMMANDS                                        *neoprojet-user-commands*
 
@@ -351,6 +362,12 @@ Behaves the same as |neoprojet.get_all_projects()| but instead of returning a
 table, it prints it to the console.
 >
     :NPPrintAllProjects
+<
+                                                              *:NPMoveProject*
+Behaves the same as |neoprojet.move_project()|. Tab completion provides a list
+of all the registered projects.
+>
+    :NPMoveProject RetroAchievements
 <
 ==============================================================================
 TELESCOPE INTEGRATION                                    *neoprojet-telescope*

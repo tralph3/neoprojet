@@ -196,6 +196,15 @@ M.write_projects = function()
     utils.write_file(config.get('project_data_path'), projects_json)
 end
 
+M.move_project = function(project_name)
+    assert(project_name ~= nil, argument_not_optional_error('project_name'))
+    assert(M.project_exists(project_name), project_not_registered_error)
+    assert(not M.project_exists(), project_registered_error)
+
+    local project = M.get_project(project_name)
+    project.root_path = vim.fn.getcwd()
+end
+
 M.save_session = function()
     if not M.project_exists() then
         return

@@ -146,3 +146,10 @@ vim.api.nvim_create_user_command(
     end,
     { nargs=1, complete=generate_project_list }
 )
+
+vim.api.nvim_create_user_command(
+    'NPMoveProject', function(args)
+        np.move_project(args.fargs[1])
+    end,
+    { nargs=1, complete=generate_project_list }
+)
