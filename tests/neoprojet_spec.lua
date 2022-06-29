@@ -22,6 +22,17 @@ describe('neoprojet', function()
         assert.same(true, np.project_exists(project_name))
     end)
 
+    it('Errors when registering project twice by path and name', function()
+        local project_name = 'Test'
+        np.register_project()
+        assert.has.errors(function() np.register_project(project_name) end)
+    end)
+
+    it('Can\'t register project with empty name', function()
+        np.register_project('')
+        assert(np.get_project().name ~= '')
+    end)
+
     it('Project does not exist', function()
         assert.same(false, np.project_exists())
     end)

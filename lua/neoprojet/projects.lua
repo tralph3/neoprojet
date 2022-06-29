@@ -13,11 +13,12 @@ end
 
 M.register_project = function(project_name)
     assert(not M.project_exists(project_name), project_registered_error)
+    assert(not M.project_exists(), project_registered_error)
 
     local project = {}
     local cwd = vim.fn.getcwd()
 
-    if project_name then
+    if project_name and project_name ~= '' then
         project.name = project_name
     else
         project.name = cwd
@@ -178,7 +179,7 @@ M.switch_project = function(project_name)
     assert(M.project_exists(project_name), project_not_registered_error)
 
     local project = M.get_project(project_name)
-    vim.api.nvim_command('cd '..project.root_path)
+    vim.api.nvim_set_current_dir(project.root_path)
 end
 
 M.read_projects = function()
