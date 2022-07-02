@@ -1,7 +1,7 @@
 local M = {}
 
 local config = {
-    project_dir_path = vim.fn.stdpath('data'),
+    projects_base_directory = vim.fn.stdpath('data'),
     sessions = false,
     default_enter_command = '',
     default_leave_command = '',

@@ -6,17 +6,17 @@ M = vim.tbl_extend('force', M, require('neoprojet.projects'))
 M.setup = function(opts)
     config.extend(opts)
     config.set(
-        'project_dir_path', config.get('project_dir_path')..'/neoprojet'
+        'project_directory', config.get('projects_base_directory')..'/neoprojet'
     )
     config.set(
-        'project_data_path', config.get('project_dir_path')..'/projects.json'
+        'project_data_path', config.get('project_directory')..'/projects.json'
     )
     config.set(
-        'sessions_path', config.get('project_dir_path')..'/sessions'
+        'sessions_directory', config.get('project_directory')..'/sessions'
     )
-    if vim.fn.empty(vim.fn.glob(config.get('project_dir_path'))) > 0 then
-        vim.fn.system('mkdir '..config.get('project_dir_path'))
-        vim.fn.system('mkdir '..config.get('sessions_path'))
+    if vim.fn.empty(vim.fn.glob(config.get('project_directory'))) > 0 then
+        vim.fn.system('mkdir '..config.get('project_directory'))
+        vim.fn.system('mkdir '..config.get('sessions_directory'))
     end
 
     require('neoprojet.autocmds')
