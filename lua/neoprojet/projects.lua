@@ -184,7 +184,7 @@ end
 
 M.read_projects = function()
     local contents = utils.read_file(config.get('project_data_path'))
-    local status_ok, stored_projects = pcall(vim.fn.json_decode, contents)
+    local status_ok, stored_projects = pcall(vim.json.decode, contents)
     if not status_ok or stored_projects == vim.NIL then
         return
     end
@@ -192,7 +192,7 @@ M.read_projects = function()
 end
 
 M.write_projects = function()
-    local projects_json = vim.fn.json_encode(projects)
+    local projects_json = vim.json.encode(projects)
 
     utils.write_file(config.get('project_data_path'), projects_json)
 end
